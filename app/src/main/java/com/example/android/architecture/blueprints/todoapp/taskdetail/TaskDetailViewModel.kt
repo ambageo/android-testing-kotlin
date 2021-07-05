@@ -126,6 +126,6 @@ class TaskDetailViewModel(private val tasksRepository: TasksRepository) : ViewMo
         private val tasksRepository: TasksRepository
     ) : ViewModelProvider.NewInstanceFactory() {
         override fun <T : ViewModel> create(modelClass: Class<T>) =
-            (TasksViewModel(tasksRepository) as T)
+            (TaskDetailViewModel(tasksRepository) as T)
     }
 }
