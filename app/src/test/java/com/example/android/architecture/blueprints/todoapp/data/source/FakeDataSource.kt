@@ -24,6 +24,10 @@ class FakeDataSource(var tasks: MutableList<Task>? = mutableListOf()) : TasksDat
         )
     }
 
+    override suspend fun deleteAllTasks() {
+        tasks?.clear()
+    }
+
     override fun observeTasks(): LiveData<Result<List<Task>>> {
         TODO("Not yet implemented")
     }
@@ -61,10 +65,6 @@ class FakeDataSource(var tasks: MutableList<Task>? = mutableListOf()) : TasksDat
     }
 
     override suspend fun clearCompletedTasks() {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun deleteAllTasks() {
         TODO("Not yet implemented")
     }
 }

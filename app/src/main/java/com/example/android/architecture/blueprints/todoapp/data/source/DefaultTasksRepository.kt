@@ -33,11 +33,17 @@ import kotlinx.coroutines.withContext
 /**
  * Concrete implementation to load tasks from the data sources into a cache.
  */
-class DefaultTasksRepository private constructor(application: Application) {
+//class DefaultTasksRepository private constructor(app: Application)
+class DefaultTasksRepository constructor(private val tasksRemoteDataSource: TasksDataSource,
+                                                 private val tasksLocalDataSource: TasksDataSource,
+                                                 private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO ) {
 
+    // Moving the variables in the constructor for the constructor injection
+    /*
     private val tasksRemoteDataSource: TasksDataSource
     private val tasksLocalDataSource: TasksDataSource
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+   */
 
     companion object {
         @Volatile
@@ -45,13 +51,17 @@ class DefaultTasksRepository private constructor(application: Application) {
 
         fun getRepository(app: Application): DefaultTasksRepository {
             return INSTANCE ?: synchronized(this) {
-                DefaultTasksRepository(app).also {
+                val database = Room.databaseBuilder(app, ToDoDatabase::class.java, "Tasks.db")
+                    .build()
+                DefaultTasksRepository(TasksRemoteDataSource, TasksLocalDataSource(database.taskDao())).also {
                     INSTANCE = it
                 }
             }
         }
     }
 
+    // This is not needed anymore because of the constructor injection
+    /*
     init {
         val database = Room.databaseBuilder(application.applicationContext,
             ToDoDatabase::class.java, "Tasks.db")
@@ -60,6 +70,7 @@ class DefaultTasksRepository private constructor(application: Application) {
         tasksRemoteDataSource = TasksRemoteDataSource
         tasksLocalDataSource = TasksLocalDataSource(database.taskDao())
     }
+    */
 
     suspend fun getTasks(forceUpdate: Boolean = false): Result<List<Task>> {
         if (forceUpdate) {
