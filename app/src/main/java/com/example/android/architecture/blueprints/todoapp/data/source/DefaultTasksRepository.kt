@@ -46,7 +46,9 @@ class DefaultTasksRepository constructor(private val tasksRemoteDataSource: Task
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
    */
 
-    companion object {
+
+    // No need for this as we create the repository in the TodoApplication with the ServiceLocator
+   /* companion object {
         @Volatile
         private var INSTANCE: DefaultTasksRepository? = null
 
@@ -59,7 +61,7 @@ class DefaultTasksRepository constructor(private val tasksRemoteDataSource: Task
                 }
             }
         }
-    }
+    }*/
 
     // This is not needed anymore because of the constructor injection
     /*
