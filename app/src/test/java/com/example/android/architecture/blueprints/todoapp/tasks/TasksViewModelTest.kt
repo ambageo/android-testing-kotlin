@@ -5,6 +5,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.android.architecture.blueprints.todoapp.Event
+import com.example.android.architecture.blueprints.todoapp.MainCoroutineRule
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeTestRepository
@@ -38,7 +39,9 @@ class TasksViewModelTest {
     @get:Rule
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @ExperimentalCoroutinesApi
+    // All this code is replaced by the MainCoroutineRule
+
+    /*@ExperimentalCoroutinesApi
     val testDispatcher: TestCoroutineDispatcher = TestCoroutineDispatcher()
 
     // Here we swap dispatchers because Dispatcher.Main cannot be used for tests
@@ -54,7 +57,11 @@ class TasksViewModelTest {
     fun tearDownDispatcher(){
         Dispatchers.resetMain()
         testDispatcher.cleanupTestCoroutines()
-    }
+    }*/
+
+    @ExperimentalCoroutinesApi
+    @get:Rule
+    var mainCoroutineRule = MainCoroutineRule()
 
     // Since we need a TaskViewModel shared between all tests, we can use @Before to set it
     @Before
