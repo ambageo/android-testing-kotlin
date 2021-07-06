@@ -40,7 +40,8 @@ class FakeTestRepository: TasksRepository {
     }
 
     override suspend fun completeTask(task: Task) {
-        TODO("Not yet implemented")
+        val completedTask = Task(task.title, task.description, true, task.id)
+        tasksServiceData[task.id] = completedTask
     }
 
     override suspend fun completeTask(taskId: String) {

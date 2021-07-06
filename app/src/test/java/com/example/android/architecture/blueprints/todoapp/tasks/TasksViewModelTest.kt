@@ -4,11 +4,19 @@ import android.app.Application
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.example.android.architecture.blueprints.todoapp.Event
+import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeTestRepository
 import com.example.android.architecture.blueprints.todoapp.getOrAwaitValue
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.setMain
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
+import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -30,6 +38,24 @@ class TasksViewModelTest {
     @get:Rule
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
+    @ExperimentalCoroutinesApi
+    val testDispatcher: TestCoroutineDispatcher = TestCoroutineDispatcher()
+
+    // Here we swap dispatchers because Dispatcher.Main cannot be used for tests
+    @ExperimentalCoroutinesApi
+    @Before
+    fun setUpDispatcher(){
+        Dispatchers.setMain(testDispatcher)
+    }
+
+    // Clean up after running the tests
+    @ExperimentalCoroutinesApi
+    @After
+    fun tearDownDispatcher(){
+        Dispatchers.resetMain()
+        testDispatcher.cleanupTestCoroutines()
+    }
+
     // Since we need a TaskViewModel shared between all tests, we can use @Before to set it
     @Before
     fun setUpViewModel() {
@@ -47,7 +73,6 @@ class TasksViewModelTest {
     }
     @Test
     fun addNewTask_setsNewTask() {
-
         // When adding a new task
         tasksViewModel.addNewTask()
 
@@ -60,10 +85,27 @@ class TasksViewModelTest {
 
     @Test
     fun setFilterAllTasks_tasksAddViewVisible() {
-
         // When the filter type is ALL_TASKS
         tasksViewModel.setFiltering(TasksFilterType.ALL_TASKS)
         // Then the "Add task" action is visible
         assertThat(tasksViewModel.tasksAddViewVisible.getOrAwaitValue(), `is` (true))
+    }
+
+    @Test
+    fun completeTask_dataAndSnackBarUpdated(){
+        // Create and add task
+        val task = Task("title", "Description")
+        tasksRepository.addTasks(task)
+
+
+        // WHEN - mark the task as complete
+        tasksViewModel.completeTask(task, true)
+
+        // THEN
+        // Verify that the task is completed
+        assertThat(tasksRepository.tasksServiceData[task.id]?.isCompleted, `is`(true))
+        // Assert that the snackBar has been updated with the correct text
+        val snackBarText: Event<Int> = tasksViewModel.snackbarText.getOrAwaitValue()
+        assertThat(snackBarText.getContentIfNotHandled(), `is`(R.string.task_marked_complete))
     }
 }
