@@ -38,8 +38,12 @@ class DefaultTasksRepositoryTest {
         tasksLocalDataSource = FakeDataSource(localTasks.toMutableList())
         // TODO Dispatchers.Unconfined should be replaced with Dispatchers.Main
         //  this requires understanding more about coroutines + testing
-        //  so we will keep this as Unconfined for now.
-        tasksRepository = DefaultTasksRepository(tasksRemoteDataSource, tasksLocalDataSource, Dispatchers.Unconfined)
+        //  so we will keep this as Unconfined for now. //DONE
+        //tasksRepository = DefaultTasksRepository(tasksRemoteDataSource, tasksLocalDataSource, Dispatchers.Unconfined)
+
+        // With MainCoroutineRule, we have swapped the MainDispatcher with the TestCoroutineDispatcher
+        tasksRepository = DefaultTasksRepository(tasksRemoteDataSource, tasksLocalDataSource, Dispatchers.Main)
+
     }
 
     @ExperimentalCoroutinesApi
