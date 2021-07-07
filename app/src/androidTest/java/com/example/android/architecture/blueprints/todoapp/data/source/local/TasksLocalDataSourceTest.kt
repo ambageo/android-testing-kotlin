@@ -72,4 +72,18 @@ class TasksLocalDataSourceTest {
         assertThat(result.data.description, `is`("description"))
         assertThat(result.data.isCompleted, `is`(false))
     }
+
+    @Test
+    fun completeTask_retrievedTaskIsComplete()= runBlocking{
+        // 1. Save a new active task in the local data source.
+        val activeTask = Task("title", "description")
+        localDataSource.saveTask(activeTask)
+        // 2. Mark it as complete.
+        localDataSource.completeTask(activeTask)
+        // 3. Check that the task can be retrieved from the local data source and is complete.
+        val result = localDataSource.getTask(activeTask.id)
+        assertThat(result.succeeded, `is`(true))
+        result as Result.Success
+        assertThat(result.data.isCompleted, `is`(true))
+    }
 }
